@@ -1,10 +1,11 @@
 import r from 'raylib';
 import { WINDOW, BALL, BOUNDARY, PADDLE } from './constants.js';
+import Paddle from './paddle.js';
 
-const drawPaddles = (paddleOffsetY) => {
+const drawPaddles = (paddleY) => {
   r.DrawRectangle(
     PADDLE.OFFSET,
-    WINDOW.HEIGHT / 2 - PADDLE.HEIGHT / 2 + paddleOffsetY,
+    paddleY,
     PADDLE.WIDTH,
     PADDLE.HEIGHT,
     PADDLE.COLOUR
@@ -19,6 +20,17 @@ const drawPaddles = (paddleOffsetY) => {
   );
 }
 
+const getPaddleConfig = () => {
+  const paddleMinY = BOUNDARY.THICKNESS;
+  const paddleMaxY = WINDOW.HEIGHT - BOUNDARY.THICKNESS - PADDLE.HEIGHT;
+  const initialPaddlePosition = (paddleMinY + paddleMaxY) / 2;
+
+  return {
+    paddleLimits: { top: paddleMinY, bottom: paddleMaxY },
+    initialPaddlePosition,
+  };
+}
+
 const drawBoundaries = () => {
   r.DrawRectangle(0, 0, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
   r.DrawRectangle(0, WINDOW.HEIGHT - BOUNDARY.THICKNESS, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
@@ -29,34 +41,36 @@ const drawCourt = () => {
   r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, BOUNDARY.COLOUR);
 }
 
-const drawGameState = (paddleOffsetY) => {
+const drawGameState = (paddleY) => {
   r.DrawCircle(WINDOW.WIDTH / 2, WINDOW.HEIGHT / 2, BALL.RADIUS, BALL.COLOUR);
-  drawPaddles(paddleOffsetY);
+  drawPaddles(paddleY);
 }
 
-const handleKeyPress = (paddleOffsetY) => {
+const handleKeyPress = (paddle) => {
   if (r.IsKeyDown(PADDLE.DOWN)) {
-    paddleOffsetY += 1;
+    paddle.moveDown();
   }
   if (r.IsKeyDown(PADDLE.UP)) {
-    paddleOffsetY -= 1;
+    paddle.moveUp();
   }
-  return paddleOffsetY;
+  return paddle.position;
 }
 
 const main = () => {
   r.InitWindow(WINDOW.WIDTH, WINDOW.HEIGHT, 'Pong game');
   r.SetTargetFPS(WINDOW.FPS);
-  let paddleOffsetY = 0;
+
+  const {paddleLimits, initialPaddlePosition} = getPaddleConfig();
+  const playerPaddle = new Paddle(paddleLimits, initialPaddlePosition);
 
   while (!r.WindowShouldClose()) {
-    paddleOffsetY = handleKeyPress(paddleOffsetY);
+    const currentPaddlePosition = handleKeyPress(playerPaddle);
 
     r.BeginDrawing();
     r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
 
     drawCourt();
-    drawGameState(paddleOffsetY);
+    drawGameState(currentPaddlePosition);
 
     r.EndDrawing();
   }
