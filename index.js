@@ -15,10 +15,10 @@ const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 const PADDLE_OFFSET = 10;
 
-const drawPaddles = () => {
+const drawPaddles = (paddleOffsetY) => {
   r.DrawRectangle(
     PADDLE_OFFSET,
-    WINDOW_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+    WINDOW_HEIGHT / 2 - PADDLE_HEIGHT / 2 + paddleOffsetY,
     PADDLE_WIDTH,
     PADDLE_HEIGHT,
     PADDLE_COLOUR
@@ -38,33 +38,34 @@ const drawBoundaries = () => {
   r.DrawRectangle(0, WINDOW_HEIGHT - BOUNDARY_THICKNESS, WINDOW_WIDTH, BOUNDARY_THICKNESS, BOUNDARY_COLOUR);
 };
 
-const drawGameWorld = () => {
+const drawGameWorld = (paddleOffsetY) => {
   drawBoundaries();
   r.DrawCircle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, BALL_RADIUS, BALL_COLOUR);
   r.DrawLine(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT, BOUNDARY_COLOUR);
-  drawPaddles();
-
-
+  drawPaddles(paddleOffsetY);
 }
 
-const drawNewFrame = (x) => {
-  r.DrawCircle(x, 10, BALL_RADIUS, BALL_COLOUR);
+const handleKeyPress = (paddleOffsetY) => {
+  if (r.IsKeyDown(r.KEY_DOWN)) {
+    paddleOffsetY += 1;
+  }
+  if (r.IsKeyDown(r.KEY_UP)) {
+    paddleOffsetY -= 1;
+  }
+  return paddleOffsetY;
 }
 
 const main = () => {
   r.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 'Pong game');
   r.SetTargetFPS(FPS);
-  let circleX = 10;
+  let paddleOffsetY = 0;
 
   while (!r.WindowShouldClose()) {
-    // Game loop code here
+    paddleOffsetY = handleKeyPress(paddleOffsetY);
+
     r.BeginDrawing();
-
     r.ClearBackground(BACKGROUND_COLOUR);
-    drawGameWorld();
-    drawNewFrame(circleX);
-    circleX += 1;
-
+    drawGameWorld(paddleOffsetY);
     r.EndDrawing();
   }
 
