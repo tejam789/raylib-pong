@@ -13,14 +13,31 @@ export default class Ball {
     return this.#ballPosition;
   }
 
-  move() {
+  move(paddlePosition, paddleConfig) {
     this.#ballPosition.x += this.#ballVelocity.x;
     this.#ballPosition.y += this.#ballVelocity.y;
 
     if (this.#ballPosition.y <= this.#boundaries.y.min || this.#ballPosition.y >= this.#boundaries.y.max) {
       this.#ballVelocity.y *= -1;
     }
-
+    if(this.#isCollidingWithPaddle(paddlePosition, paddleConfig)) {
+      this.#ballVelocity.x *= -1;
+    }
     return this.#ballPosition;
+  }
+
+  #isWithInPaddleHeight(paddlePosition, paddleConfig) {
+    const paddleTop = paddlePosition;
+    const paddleBottom = paddlePosition + paddleConfig.HEIGHT;
+    return this.#ballPosition.y >= paddleTop && this.#ballPosition.y <= paddleBottom;
+  }
+
+  #isOnPaddleface(paddleConfig) {
+    return this.#ballPosition.x === paddleConfig.WIDTH + paddleConfig.OFFSET;
+  }
+
+  #isCollidingWithPaddle(paddlePosition, paddleConfig) {
+    return this.#isOnPaddleface(paddleConfig) && this.#isWithInPaddleHeight(paddlePosition, paddleConfig);
+
   }
 }

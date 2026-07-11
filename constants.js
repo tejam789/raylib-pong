@@ -12,7 +12,7 @@ const BALL = {
   RADIUS: 5,
 };
 
-const BOUNDARY = {
+const WALL = {
   COLOUR: r.DARKGRAY,
   THICKNESS: 20,
 };
@@ -29,6 +29,6 @@ const PADDLE = {
 export {
   WINDOW,
   BALL,
-  BOUNDARY,
+  WALL,
   PADDLE,
 };

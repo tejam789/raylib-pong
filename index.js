@@ -1,5 +1,5 @@
 import r from 'raylib';
-import { WINDOW, BALL, BOUNDARY, PADDLE } from './constants.js';
+import { WINDOW, BALL, WALL, PADDLE } from './constants.js';
 import Paddle from './paddle.js';
 import Ball from './ball.js';
 
@@ -22,8 +22,8 @@ const drawPaddles = (paddleY) => {
 }
 
 const getPaddleConfig = () => {
-  const paddleMinY = BOUNDARY.THICKNESS;
-  const paddleMaxY = WINDOW.HEIGHT - BOUNDARY.THICKNESS - PADDLE.HEIGHT;
+  const paddleMinY = WALL.THICKNESS;
+  const paddleMaxY = WINDOW.HEIGHT - WALL.THICKNESS - PADDLE.HEIGHT;
   const initialPaddlePosition = (paddleMinY + paddleMaxY) / 2;
 
   return {
@@ -34,8 +34,8 @@ const getPaddleConfig = () => {
 
 const getBallConfig = () => {
   const ballPosition = { x: WINDOW.WIDTH / 2, y: WINDOW.HEIGHT / 2 };
-  const ballVelocity = { x: 1, y: 2 };
-  const edge = BALL.RADIUS + BOUNDARY.THICKNESS;
+  const ballVelocity = { x: -1, y: 2 };
+  const edge = BALL.RADIUS + WALL.THICKNESS;
   const ballLimits = {
     x: { min: BALL.RADIUS, max: WINDOW.WIDTH - BALL.RADIUS },
     y: { min: edge, max: WINDOW.HEIGHT - edge },
@@ -44,14 +44,14 @@ const getBallConfig = () => {
   return { ballPosition, ballVelocity, ballLimits };
 }
 
-const drawBoundaries = () => {
-  r.DrawRectangle(0, 0, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
-  r.DrawRectangle(0, WINDOW.HEIGHT - BOUNDARY.THICKNESS, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
+const drawWalls = () => {
+  r.DrawRectangle(0, 0, WINDOW.WIDTH, WALL.THICKNESS, WALL.COLOUR);
+  r.DrawRectangle(0, WINDOW.HEIGHT - WALL.THICKNESS, WINDOW.WIDTH, WALL.THICKNESS, WALL.COLOUR);
 };
 
 const drawCourt = () => {
-  drawBoundaries();
-  r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, BOUNDARY.COLOUR);
+  drawWalls();
+  r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, WALL.COLOUR);
 }
 
 const drawBall = ({x, y}) => {
@@ -78,8 +78,8 @@ const main = () => {
   const ball = new Ball(ballLimits, ballPosition, ballVelocity);
 
   while (!r.WindowShouldClose()) {
-    ball.move();
     const currentPaddlePosition = handleKeyPress(playerPaddle);
+    ball.move(currentPaddlePosition, PADDLE);
 
     r.BeginDrawing();
     r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
