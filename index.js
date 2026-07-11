@@ -1,6 +1,7 @@
 import r from 'raylib';
 import { WINDOW, BALL, BOUNDARY, PADDLE } from './constants.js';
 import Paddle from './paddle.js';
+import Ball from './ball.js';
 
 const drawPaddles = (paddleY) => {
   r.DrawRectangle(
@@ -31,6 +32,18 @@ const getPaddleConfig = () => {
   };
 }
 
+const getBallConfig = () => {
+  const ballPosition = { x: WINDOW.WIDTH / 2, y: WINDOW.HEIGHT / 2 };
+  const ballVelocity = { x: 2, y: 1 };
+  const edge = BALL.RADIUS + BOUNDARY.THICKNESS;
+  const ballLimits = {
+    x: { min: BALL.RADIUS, max: WINDOW.WIDTH - BALL.RADIUS },
+    y: { min: edge, max: WINDOW.HEIGHT - edge },
+  };
+
+  return { ballPosition, ballVelocity, ballLimits };
+}
+
 const drawBoundaries = () => {
   r.DrawRectangle(0, 0, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
   r.DrawRectangle(0, WINDOW.HEIGHT - BOUNDARY.THICKNESS, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
@@ -41,9 +54,8 @@ const drawCourt = () => {
   r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, BOUNDARY.COLOUR);
 }
 
-const drawGameState = (paddleY) => {
-  r.DrawCircle(WINDOW.WIDTH / 2, WINDOW.HEIGHT / 2, BALL.RADIUS, BALL.COLOUR);
-  drawPaddles(paddleY);
+const drawBall = ({x, y}) => {
+  r.DrawCircle(x, y, BALL.RADIUS, BALL.COLOUR);
 }
 
 const handleKeyPress = (paddle) => {
@@ -61,16 +73,20 @@ const main = () => {
   r.SetTargetFPS(WINDOW.FPS);
 
   const {paddleLimits, initialPaddlePosition} = getPaddleConfig();
+  const {ballPosition, ballVelocity, ballLimits} = getBallConfig();
   const playerPaddle = new Paddle(paddleLimits, initialPaddlePosition);
+  const ball = new Ball(ballLimits, ballPosition, ballVelocity);
 
   while (!r.WindowShouldClose()) {
     const currentPaddlePosition = handleKeyPress(playerPaddle);
+    ball.move();
 
     r.BeginDrawing();
     r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
 
     drawCourt();
-    drawGameState(currentPaddlePosition);
+    drawPaddles(currentPaddlePosition);
+    drawBall(ball.position);
 
     r.EndDrawing();
   }
