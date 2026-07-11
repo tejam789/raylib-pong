@@ -1,12 +1,16 @@
 export default class Ball {
   #ballPosition;
   #ballVelocity;
+  #initialBallPosition;
+  #initialBallVelocity;
   #boundaries;
 
   constructor(boundaries, initialBallPosition, initialBallVelocity) {
     this.#boundaries = boundaries;
-    this.#ballPosition = initialBallPosition;
-    this.#ballVelocity = initialBallVelocity;
+    this.#initialBallPosition = initialBallPosition;
+    this.#initialBallVelocity = initialBallVelocity;
+    this.#ballPosition = { ...initialBallPosition };
+    this.#ballVelocity = { ...initialBallVelocity };
   }
 
   get position() {
@@ -26,6 +30,19 @@ export default class Ball {
     return this.#ballPosition;
   }
 
+  isBeforeX(x) {
+    return this.#ballPosition.x <= x;
+  }
+
+  isAfterX(x) {
+    return this.#ballPosition.x >= x;
+  }
+
+  reset() {
+    this.#ballPosition = { ...this.#initialBallPosition };
+    this.#ballVelocity = { ...this.#initialBallVelocity };
+  }
+
   #isWithInPaddleHeight(paddlePosition, paddleConfig) {
     const paddleTop = paddlePosition;
     const paddleBottom = paddlePosition + paddleConfig.HEIGHT;
@@ -38,6 +55,5 @@ export default class Ball {
 
   #isCollidingWithPaddle(paddlePosition, paddleConfig) {
     return this.#isOnPaddleface(paddleConfig) && this.#isWithInPaddleHeight(paddlePosition, paddleConfig);
-
   }
 }

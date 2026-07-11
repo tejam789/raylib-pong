@@ -34,7 +34,7 @@ const getPaddleConfig = () => {
 
 const getBallConfig = () => {
   const ballPosition = { x: WINDOW.WIDTH / 2, y: WINDOW.HEIGHT / 2 };
-  const ballVelocity = { x: -1, y: 2 };
+  const ballVelocity = { x: -2, y: 1 };
   const edge = BALL.RADIUS + WALL.THICKNESS;
   const ballLimits = {
     x: { min: BALL.RADIUS, max: WINDOW.WIDTH - BALL.RADIUS },
@@ -42,6 +42,11 @@ const getBallConfig = () => {
   };
 
   return { ballPosition, ballVelocity, ballLimits };
+}
+
+const drawScores = (playerScore, botScore) => {
+  r.DrawText(`Player: ${playerScore}`, 20, 20, 20, r.DARKBLUE);
+  r.DrawText(`Bot: ${botScore}`, WINDOW.WIDTH - 100, 20, 20, r.DARKBLUE);
 }
 
 const drawWalls = () => {
@@ -77,6 +82,9 @@ const main = () => {
   const playerPaddle = new Paddle(paddleLimits, initialPaddlePosition);
   const ball = new Ball(ballLimits, ballPosition, ballVelocity);
 
+  let playerScore = 0;
+  let botScore = 0;
+
   while (!r.WindowShouldClose()) {
     const currentPaddlePosition = handleKeyPress(playerPaddle);
     ball.move(currentPaddlePosition, PADDLE);
@@ -88,6 +96,16 @@ const main = () => {
     drawPaddles(currentPaddlePosition);
     drawBall(ball.position);
 
+    if(ball.isBeforeX(BALL.RADIUS)) {
+      botScore++;
+      ball.reset();
+    }
+    if(ball.isAfterX(WINDOW.WIDTH - BALL.RADIUS)) {
+      playerScore++;
+      ball.reset();
+    }
+
+    drawScores(playerScore, botScore);
     r.EndDrawing();
   }
 
