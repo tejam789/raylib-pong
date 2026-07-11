@@ -34,7 +34,7 @@ const getPaddleConfig = () => {
 
 const getBallConfig = () => {
   const ballPosition = { x: WINDOW.WIDTH / 2, y: WINDOW.HEIGHT / 2 };
-  const ballVelocity = { x: 2, y: 1 };
+  const ballVelocity = { x: 1, y: 2 };
   const edge = BALL.RADIUS + BOUNDARY.THICKNESS;
   const ballLimits = {
     x: { min: BALL.RADIUS, max: WINDOW.WIDTH - BALL.RADIUS },
@@ -78,8 +78,8 @@ const main = () => {
   const ball = new Ball(ballLimits, ballPosition, ballVelocity);
 
   while (!r.WindowShouldClose()) {
-    const currentPaddlePosition = handleKeyPress(playerPaddle);
     ball.move();
+    const currentPaddlePosition = handleKeyPress(playerPaddle);
 
     r.BeginDrawing();
     r.ClearBackground(WINDOW.BACKGROUND_COLOUR);

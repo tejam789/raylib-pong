@@ -16,5 +16,11 @@ export default class Ball {
   move() {
     this.#ballPosition.x += this.#ballVelocity.x;
     this.#ballPosition.y += this.#ballVelocity.y;
+
+    if (this.#ballPosition.y <= this.#boundaries.y.min || this.#ballPosition.y >= this.#boundaries.y.max) {
+      this.#ballVelocity.y *= -1;
+    }
+
+    return this.#ballPosition;
   }
 }
