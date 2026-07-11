@@ -1,76 +1,59 @@
-const r = require('raylib');
-
-const WINDOW_WIDTH = 800;
-const WINDOW_HEIGHT = 450;
-const FPS = 60;
-const BACKGROUND_COLOUR = r.RAYWHITE;
-
-const BALL_COLOUR = r.RED;
-const BALL_RADIUS = 5;
-
-const BOUNDARY_COLOUR = r.DARKGRAY;
-const BOUNDARY_THICKNESS = 20;
-
-const PADDLE_COLOUR = r.DARKBLUE;
-const PADDLE_WIDTH = 10;
-const PADDLE_HEIGHT = 50;
-const PADDLE_OFFSET = 10;
-const PADDLE_DOWN = r.KEY_DOWN;
-const PADDLE_UP = r.KEY_UP;
+import r from 'raylib';
+import { WINDOW, BALL, BOUNDARY, PADDLE } from './constants.js';
 
 const drawPaddles = (paddleOffsetY) => {
   r.DrawRectangle(
-    PADDLE_OFFSET,
-    WINDOW_HEIGHT / 2 - PADDLE_HEIGHT / 2 + paddleOffsetY,
-    PADDLE_WIDTH,
-    PADDLE_HEIGHT,
-    PADDLE_COLOUR
+    PADDLE.OFFSET,
+    WINDOW.HEIGHT / 2 - PADDLE.HEIGHT / 2 + paddleOffsetY,
+    PADDLE.WIDTH,
+    PADDLE.HEIGHT,
+    PADDLE.COLOUR
   );
 
   r.DrawRectangle(
-    WINDOW_WIDTH - PADDLE_OFFSET - PADDLE_WIDTH,
-    WINDOW_HEIGHT / 2 - PADDLE_HEIGHT / 2,
-    PADDLE_WIDTH,
-    PADDLE_HEIGHT,
-    PADDLE_COLOUR
+    WINDOW.WIDTH - PADDLE.OFFSET - PADDLE.WIDTH,
+    WINDOW.HEIGHT / 2 - PADDLE.HEIGHT / 2,
+    PADDLE.WIDTH,
+    PADDLE.HEIGHT,
+    PADDLE.COLOUR
   );
 }
 
 const drawBoundaries = () => {
-  r.DrawRectangle(0, 0, WINDOW_WIDTH, BOUNDARY_THICKNESS, BOUNDARY_COLOUR);
-  r.DrawRectangle(0, WINDOW_HEIGHT - BOUNDARY_THICKNESS, WINDOW_WIDTH, BOUNDARY_THICKNESS, BOUNDARY_COLOUR);
+  r.DrawRectangle(0, 0, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
+  r.DrawRectangle(0, WINDOW.HEIGHT - BOUNDARY.THICKNESS, WINDOW.WIDTH, BOUNDARY.THICKNESS, BOUNDARY.COLOUR);
 };
 
 const drawCourt = () => {
   drawBoundaries();
-  r.DrawLine(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT, BOUNDARY_COLOUR);
+  r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, BOUNDARY.COLOUR);
 }
 
 const drawGameState = (paddleOffsetY) => {
-  r.DrawCircle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, BALL_RADIUS, BALL_COLOUR);
+  r.DrawCircle(WINDOW.WIDTH / 2, WINDOW.HEIGHT / 2, BALL.RADIUS, BALL.COLOUR);
   drawPaddles(paddleOffsetY);
 }
 
 const handleKeyPress = (paddleOffsetY) => {
-  if (r.IsKeyDown(PADDLE_DOWN)) {
+  if (r.IsKeyDown(PADDLE.DOWN)) {
     paddleOffsetY += 1;
   }
-  if (r.IsKeyDown(PADDLE_UP)) {
+  if (r.IsKeyDown(PADDLE.UP)) {
     paddleOffsetY -= 1;
   }
   return paddleOffsetY;
 }
 
 const main = () => {
-  r.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 'Pong game');
-  r.SetTargetFPS(FPS);
+  r.InitWindow(WINDOW.WIDTH, WINDOW.HEIGHT, 'Pong game');
+  r.SetTargetFPS(WINDOW.FPS);
   let paddleOffsetY = 0;
 
   while (!r.WindowShouldClose()) {
     paddleOffsetY = handleKeyPress(paddleOffsetY);
 
     r.BeginDrawing();
-    r.ClearBackground(BACKGROUND_COLOUR);
+    r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
 
     drawCourt();
     drawGameState(paddleOffsetY);
