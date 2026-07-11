@@ -38,10 +38,13 @@ const drawBoundaries = () => {
   r.DrawRectangle(0, WINDOW_HEIGHT - BOUNDARY_THICKNESS, WINDOW_WIDTH, BOUNDARY_THICKNESS, BOUNDARY_COLOUR);
 };
 
-const drawGameWorld = (paddleOffsetY) => {
+const drawCourt = () => {
   drawBoundaries();
-  r.DrawCircle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, BALL_RADIUS, BALL_COLOUR);
   r.DrawLine(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT, BOUNDARY_COLOUR);
+}
+
+const drawGameState = (paddleOffsetY) => {
+  r.DrawCircle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, BALL_RADIUS, BALL_COLOUR);
   drawPaddles(paddleOffsetY);
 }
 
@@ -65,7 +68,10 @@ const main = () => {
 
     r.BeginDrawing();
     r.ClearBackground(BACKGROUND_COLOUR);
-    drawGameWorld(paddleOffsetY);
+
+    drawCourt();
+    drawGameState(paddleOffsetY);
+    
     r.EndDrawing();
   }
 
