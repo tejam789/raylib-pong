@@ -73,29 +73,26 @@ const handleKeyPress = (paddle) => {
   return paddle.position;
 }
 
-const main = () => {
-  r.InitWindow(WINDOW.WIDTH, WINDOW.HEIGHT, 'Pong game');
-  r.SetTargetFPS(WINDOW.FPS);
-
+const play = () => {
   const {paddleLimits, initialPaddlePosition} = getPaddleConfig();
   const {ballPosition, ballVelocity, ballLimits} = getBallConfig();
   const playerPaddle = new Paddle(paddleLimits, initialPaddlePosition);
   const ball = new Ball(ballLimits, ballPosition, ballVelocity);
-
+  
   let playerScore = 0;
   let botScore = 0;
-
+  
   while (!r.WindowShouldClose()) {
     const currentPaddlePosition = handleKeyPress(playerPaddle);
     ball.move(currentPaddlePosition, PADDLE);
-
+    
     r.BeginDrawing();
     r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
-
+    
     drawCourt();
     drawPaddles(currentPaddlePosition);
     drawBall(ball.position);
-
+    
     if(ball.isBeforeX(BALL.RADIUS)) {
       botScore++;
       ball.reset();
@@ -104,12 +101,35 @@ const main = () => {
       playerScore++;
       ball.reset();
     }
-
+    
     drawScores(playerScore, botScore);
     r.EndDrawing();
   }
-
+  
   r.CloseWindow();
 }
+
+const startGame = () => {
+  
+  while (!r.WindowShouldClose() && !r.IsKeyDown(65)) {
+    r.BeginDrawing();
+    r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
+    r.DrawText('Press A to start', WINDOW.WIDTH / 2 - 100, WINDOW.HEIGHT / 2, 20, r.DARKBLUE);
+    r.EndDrawing();
+    // Wait for user input
+  }
+  
+  if (r.WindowShouldClose()) {
+    r.CloseWindow();
+    return;
+  }
+  play();
+}
+
+const main = () => {
+  r.InitWindow(WINDOW.WIDTH, WINDOW.HEIGHT, 'Pong game');
+  r.SetTargetFPS(WINDOW.FPS);
+  startGame();
+};
 
 main();
