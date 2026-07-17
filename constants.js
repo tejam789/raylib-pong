@@ -26,9 +26,16 @@ const PADDLE = {
   UP: r.KEY_UP,
 };
 
+const OPTIONS = {
+  FONT_SIZE: 20,
+  GAP: 10,
+  SELECTION_OFFSET: 48,
+};
+
 export {
   WINDOW,
   BALL,
   WALL,
   PADDLE,
+  OPTIONS,
 };
