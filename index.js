@@ -21,6 +21,49 @@ const drawPaddles = (paddleY) => {
 	);
 };
 
+const drawScores = (playerScore, botScore) => {
+  r.DrawText(`Player: ${playerScore}`, 20, 20, 20, r.DARKBLUE);
+  r.DrawText(`Bot: ${botScore}`, WINDOW.WIDTH - 100, 20, 20, r.DARKBLUE);
+};
+
+const drawWalls = () => {
+  r.DrawRectangle(0, 0, WINDOW.WIDTH, WALL.THICKNESS, WALL.COLOUR);
+  r.DrawRectangle(
+    0,
+    WINDOW.HEIGHT - WALL.THICKNESS,
+    WINDOW.WIDTH,
+    WALL.THICKNESS,
+    WALL.COLOUR,
+  );
+};
+
+const drawCourt = () => {
+  drawWalls();
+  r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, WALL.COLOUR);
+};
+
+const drawOptions = (options) => {
+  const optionHeight = OPTIONS.FONT_SIZE + OPTIONS.GAP;
+
+  options.forEach((option, index) => {
+    const distanceFrom1stOption = index * optionHeight;
+    const optionsStartY = WINDOW.HEIGHT / 2 - optionHeight * options.length;
+    const optionsStartX = WINDOW.WIDTH / 2 - 100;
+
+    r.DrawText(
+      `${index + 1}. ${option}`,
+      optionsStartX,
+      optionsStartY + distanceFrom1stOption,
+      OPTIONS.FONT_SIZE,
+      r.DARKBLUE,
+    );
+  });
+};
+
+const drawBall = ({ x, y }) => {
+  r.DrawCircle(x, y, BALL.RADIUS, BALL.COLOUR);
+};
+
 const getPaddleConfig = () => {
 	const paddleMinY = WALL.THICKNESS;
 	const paddleMaxY = WINDOW.HEIGHT - WALL.THICKNESS - PADDLE.HEIGHT;
@@ -44,49 +87,6 @@ const getBallConfig = () => {
 	return { ballPosition, ballVelocity, ballLimits };
 };
 
-const drawScores = (playerScore, botScore) => {
-	r.DrawText(`Player: ${playerScore}`, 20, 20, 20, r.DARKBLUE);
-	r.DrawText(`Bot: ${botScore}`, WINDOW.WIDTH - 100, 20, 20, r.DARKBLUE);
-};
-
-const drawWalls = () => {
-	r.DrawRectangle(0, 0, WINDOW.WIDTH, WALL.THICKNESS, WALL.COLOUR);
-	r.DrawRectangle(
-		0,
-		WINDOW.HEIGHT - WALL.THICKNESS,
-		WINDOW.WIDTH,
-		WALL.THICKNESS,
-		WALL.COLOUR,
-	);
-};
-
-const drawCourt = () => {
-	drawWalls();
-	r.DrawLine(WINDOW.WIDTH / 2, 0, WINDOW.WIDTH / 2, WINDOW.HEIGHT, WALL.COLOUR);
-};
-
-const drawOptions = (options) => {
-	const optionHeight = OPTIONS.FONT_SIZE + OPTIONS.GAP;
-
-	options.forEach((option, index) => {
-		const distanceFrom1stOption = index * optionHeight;
-		const optionsStartY = WINDOW.HEIGHT / 2 - optionHeight * options.length;
-		const optionsStartX = WINDOW.WIDTH / 2 - 100;
-
-		r.DrawText(
-			`${index + 1}. ${option}`,
-			optionsStartX,
-			optionsStartY + distanceFrom1stOption,
-			OPTIONS.FONT_SIZE,
-			r.DARKBLUE,
-		);
-	});
-};
-
-const drawBall = ({ x, y }) => {
-	r.DrawCircle(x, y, BALL.RADIUS, BALL.COLOUR);
-};
-
 const handleKeyPress = (paddle) => {
 	if (r.IsKeyDown(PADDLE.DOWN)) {
 		paddle.moveDown();
@@ -96,6 +96,23 @@ const handleKeyPress = (paddle) => {
 	}
 	return paddle.position;
 };
+
+const isAValidOption = (key, totaloptions) => {
+	return key && key > OPTIONS.SELECTION_OFFSET && key <= OPTIONS.SELECTION_OFFSET + totaloptions;
+};
+
+const updateScores = (ball, botScore, playerScore) => {
+  if (ball.isBeforeX(BALL.RADIUS)) {
+    botScore++;
+    ball.reset();
+  }
+  if (ball.isAfterX(WINDOW.WIDTH - BALL.RADIUS)) {
+    playerScore++;
+    ball.reset();
+  }
+  return { botScore, playerScore };
+}
+
 
 const play = () => {
 	const { paddleLimits, initialPaddlePosition } = getPaddleConfig();
@@ -117,14 +134,7 @@ const play = () => {
 		drawPaddles(currentPaddlePosition);
 		drawBall(ball.position);
 
-		if (ball.isBeforeX(BALL.RADIUS)) {
-			botScore++;
-			ball.reset();
-		}
-		if (ball.isAfterX(WINDOW.WIDTH - BALL.RADIUS)) {
-			playerScore++;
-			ball.reset();
-		}
+		({ botScore, playerScore } = updateScores(ball, botScore, playerScore));
 
 		drawScores(playerScore, botScore);
 		r.EndDrawing();
@@ -133,13 +143,9 @@ const play = () => {
 	r.CloseWindow();
 };
 
-const isAValidOption = (key, totaloptions) => {
-	return key && key > 48 && key <= 48 + totaloptions;
-};
-
 const menu = (options, defaultOption) => {
 	let keyPressed;
-	let shouldWindowClose = r.WindowShouldClose();
+	let shouldWindowClose = false;
 
 	while (!shouldWindowClose && !isAValidOption(keyPressed, options.length)) {
 		const key = r.GetKeyPressed();
@@ -149,16 +155,15 @@ const menu = (options, defaultOption) => {
 		r.BeginDrawing();
 		r.ClearBackground(WINDOW.BACKGROUND_COLOUR);
 		drawOptions(options.map((op) => op.name));
-
 		r.EndDrawing();
 	}
 
 	if (shouldWindowClose) {
 		r.CloseWindow();
-		return;
 	}
 
-	options[keyPressed - OPTIONS.SELECTION_OFFSET - 1].onSelect();
+  const selectedOptionIndex = keyPressed - OPTIONS.SELECTION_OFFSET - 1;
+	options[selectedOptionIndex].onSelect();
 };
 
 const main = () => {

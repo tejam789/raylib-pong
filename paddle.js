@@ -9,7 +9,7 @@ export default class Paddle {
 
   moveUp() {
     if(this.#paddlePosition > this.#paddleLimits.top) {
-      this.#paddlePosition -= 1;
+      this.#paddlePosition -= 2;
     }
 
     return this.#paddlePosition;
@@ -17,7 +17,7 @@ export default class Paddle {
   
   moveDown() {
     if(this.#paddlePosition < this.#paddleLimits.bottom) {
-      this.#paddlePosition += 1;
+      this.#paddlePosition += 2;
     }
 
     return this.#paddlePosition;
